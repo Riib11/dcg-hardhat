@@ -83,9 +83,11 @@ export class Dapp extends React.Component {
 
     // If the token data or the user's balance hasn't loaded yet, we show
     // a loading component.
-    if (!this.state.tokenData || !this.state.balance) {
+    if ((this.state.tokenData === undefined) || (this.state.balance === undefined)) {
       return <Loading />;
     }
+
+    // console.debug("balance:", typeof this.state.balance, "=", this.state.balance);
 
     // If everything is loaded, we render the application.
     return (
@@ -136,7 +138,7 @@ export class Dapp extends React.Component {
             {/*
               If the user has no tokens, we don't show the Transfer form
             */}
-            {this.state.balance.eq(0) && (
+            {this.state.balance == 0 && (
               <NoTokensMessage selectedAddress={this.state.selectedAddress} />
             )}
 
@@ -146,7 +148,7 @@ export class Dapp extends React.Component {
               The component doesn't have logic, it just calls the transferTokens
               callback.
             */}
-            {this.state.balance.gt(0) && (
+            {this.state.balance > 0 && (
               <Transfer
                 transferTokens={(to, amount) =>
                   this._transferTokens(to, amount)
@@ -210,29 +212,12 @@ export class Dapp extends React.Component {
     // Fetching the token data and the user's balance are specific to this
     // sample project, but you can reuse the same initialization pattern.
     await this._initializeEthers();
-    // TODO: re-enable once _initializeEthers works
-    // await this._getTokenData();
-    // await this._startPollingData();
+    await this._getTokenData();
+    await this._startPollingData();
   }
 
   async _initializeEthers() {
-    console.log("[_initializeEthers]");
-
-    // await ethereum.request({
-    //   method: 'wallet_addEthereumChain',
-    //   params: [
-    //     {
-    //       chainId: '0x539',
-    //       chainName: 'local hardhat testnet',
-    //       rpcUrls: ['http://localhost:8545/'],
-    //       nativeCurrency: {
-    //         name: "ether",
-    //         symbol: 'ETH',
-    //         decimals: 18
-    //       },
-    //     },
-    //   ],
-    // });
+    // console.debug("[_initializeEthers]");
 
     try {
       await ethereum.request({
@@ -282,14 +267,6 @@ export class Dapp extends React.Component {
     // For this, you need the account signer...
     const signer = await this._provider.getSigner();
 
-    console.log("[_initializeEthers]",
-      {
-        contractAddress,
-        TokenArtifact,
-        signer
-      }
-    );
-
     // Then, we initialize the contract using that provider and the token's
     // artifact. You can do this same thing with your contracts.
     this._token = new ethers.Contract(
@@ -298,7 +275,7 @@ export class Dapp extends React.Component {
       signer
     );
 
-    console.log("[_initializeEtheres]", "[token]", this._token);
+    // console.debug("[_initializeEtheres]", "[token]", this._token);
   }
 
   // The next two methods are needed to start and stop polling data. While
@@ -309,7 +286,7 @@ export class Dapp extends React.Component {
   // don't need to poll it. If that's the case, you can just fetch it when you
   // initialize the app, as we do with the token data.
   async _startPollingData() {
-    console.log("[_startPollingData]");
+    // console.debug("[_startPollingData]");
     this._pollDataInterval = setInterval(() => this._updateBalance(), 1000);
 
     // We run it once immediately so we don't have to wait for it
@@ -324,16 +301,20 @@ export class Dapp extends React.Component {
   // The next two methods just read from the contract and store the results
   // in the component state.
   async _getTokenData() {
-    console.log("[_getTokenData]");
+    // console.debug("[_getTokenData]");
     const name = await this._token.name();
     const symbol = await this._token.symbol();
+
+    // console.debug("[_getTokenData]", { name, symbol });
 
     this.setState({ tokenData: { name, symbol } });
   }
 
   async _updateBalance() {
+    // console.debug("[_updateBalance]");
     const balance = await this._token.balanceOf(this.state.selectedAddress);
     this.setState({ balance });
+    // console.debug("[_updateBalance]", this.state);
   }
 
   // This method sends an ethereum transaction to transfer tokens.
@@ -422,17 +403,47 @@ export class Dapp extends React.Component {
   }
 
   async _switchChain() {
+    try {
+      const chainIdHex = `0x${HARDHAT_NETWORK_ID.toString(16)}`
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: chainIdHex }],
+      });
+      await this._initialize(this.state.selectedAddress);
+    } catch (switchError) {
+      if (switchError.code === 4902) {
+        // This error code indicates that the chain has not been added to
+        // MetaMask.
+        await this._addChain();
+      } else {
+        console.error(switchError);
+      }
+    }
+  }
+
+  async _addChain() {
     const chainIdHex = `0x${HARDHAT_NETWORK_ID.toString(16)}`
     await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: chainIdHex }],
+      method: 'wallet_addEthereumChain',
+      params: [
+        {
+          chainId: chainIdHex,
+          chainName: 'local hardhat testnet',
+          rpcUrls: ['http://localhost:8545/'],
+          nativeCurrency: {
+            name: "ether",
+            symbol: 'ETH',
+            decimals: 18
+          },
+        },
+      ],
     });
-    await this._initialize(this.state.selectedAddress);
   }
 
   // This method checks if the selected network is Localhost:8545
-  _checkNetwork() {
-    if (window.ethereum.networkVersion !== HARDHAT_NETWORK_ID) {
+  async _checkNetwork() {
+    const networkVersion = await window.ethereum.request({ method: 'net_version' });
+    if (networkVersion !== HARDHAT_NETWORK_ID) {
       this._switchChain();
     }
   }
