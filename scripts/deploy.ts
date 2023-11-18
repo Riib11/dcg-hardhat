@@ -1,27 +1,45 @@
-import { ethers } from "hardhat";
+import { artifacts, ethers } from "hardhat";
+import * as path from "path";
+import * as fs from "fs";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
-
-  const lockedAmount = ethers.parseEther("0.001");
-
-  const lock = await ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
-
-  await lock.waitForDeployment();
-
+  // ethers is available in the global scope
+  const [deployer] = await ethers.getSigners();
   console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
+    "Deploying the contracts with the account:",
+    await deployer.getAddress()
+  );
+
+  const token = await ethers.deployContract("Token", [], {});
+  await token.waitForDeployment();
+
+  const address = await token.getAddress()
+  console.log("Token address:", address);
+
+  // We also save the contract's artifacts and address in the frontend directory
+
+  const contractsDir = path.join(__dirname, "..", "frontend", "src", "contracts");
+
+  if (!fs.existsSync(contractsDir)) {
+    fs.mkdirSync(contractsDir);
+  }
+
+  fs.writeFileSync(
+    path.join(contractsDir, "contract-address.json"),
+    JSON.stringify({ Token: address }, undefined, 2)
+  );
+
+  const TokenArtifact = artifacts.readArtifactSync("Token");
+
+  fs.writeFileSync(
+    path.join(contractsDir, "Token.json"),
+    JSON.stringify(TokenArtifact, null, 2)
   );
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
