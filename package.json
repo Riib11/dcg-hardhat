@@ -6,7 +6,11 @@
   "scripts": {
     "node": "npx hardhat node",
     "apollo": "npx hardhat ignition deploy ignition/modules/Apollo.ts --network localhost",
-    "lock": "npx hardhat ignition deploy ignition/modules/Lock.ts --network localhost"
+    "lock": "npx hardhat ignition deploy ignition/modules/Lock.ts --network localhost",
+    "faucet": "npx hardhat --network localhost faucet 0x169372128cf316fe309b82925ff407ba02e0ec1a",
+    "deploy": " npx hardhat run scripts/deploy.ts --network localhost",
+    "frontend": "cd frontend && npm run start",
+    "start": "npm run deploy && npm run frontend"
   },
   "keywords": [],
   "author": "",

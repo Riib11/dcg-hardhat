@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require("fs");
 
 // This file is only here to make interacting with the Dapp easier,
 // feel free to ignore it if you don't need it.
@@ -33,14 +33,14 @@ task("faucet", "Sends ETH and tokens to an address")
     const token = await ethers.getContractAt("Token", address.Token);
     const [sender] = await ethers.getSigners();
 
+    // send 100 MHT
     const tx = await token.transfer(receiver, 100);
     await tx.wait();
 
-    // TODO: suspicious that didn't typecheck
+    // send 1 WEI
     const tx2 = await sender.sendTransaction({
       to: receiver,
-      // value: ethers.constants.WeiPerEther,
-      value: 1,
+      value: ethers.WeiPerEther,
     });
     await tx2.wait();
 
