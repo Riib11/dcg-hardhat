@@ -1,0 +1,19 @@
+{
+  "name": "dcg-hardhat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "node": "npx hardhat node",
+    "apollo": "npx hardhat ignition deploy ignition/modules/Apollo.ts --network localhost",
+    "lock": "npx hardhat ignition deploy ignition/modules/Lock.ts --network localhost"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^0.11.2",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.1"
+  }
+}
