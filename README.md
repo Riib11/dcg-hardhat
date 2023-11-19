@@ -1,13 +1,31 @@
-# Sample Hardhat Project
+# DCG
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+Designer Card Game.
 
-Try running some of the following tasks:
+Note that this is a very preliminary outline.
 
+The idea is that the users design their own cards, which they can prove original
+ownership of on the blockchain. Then players can create game invites to which
+any player can join and compete for a prize.
+
+## Usage
+
+To setup:
+```
+npm install
+```
+
+To start a local node:
 ```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
+npm run node
+```
+
+To deploy the smart contract:
+```shell
+npm run deploy
+```
+
+And finally, to launch the webapp:
+```shell
+npm run start
 ```
