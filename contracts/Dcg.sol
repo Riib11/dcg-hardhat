@@ -39,7 +39,7 @@ contract Dcg {
         Card[] cards;
     }
 
-    Game[] games;
+    Game[] public games;
 
     // Action
 
@@ -53,10 +53,12 @@ contract Dcg {
         Attack
     }
 
+    constructor() {}
+
     /*
      * Create a new game.
      */
-    function createGame(Game calldata game) external returns (uint gameIx) {
+    function createGame(Game calldata game) public returns (uint gameIx) {
         require(game.player1.addr == msg.sender);
         require(game.turn == 0);
 
@@ -69,7 +71,7 @@ contract Dcg {
     /*
      * Play your turn in an existing game.
      */
-    function playTurn(uint gameIx, Action calldata action) external {
+    function playTurn(uint gameIx, Action calldata action) public {
         require(gameIx < games.length);
         Game storage game = games[gameIx];
         if (game.turn % 2 == 0) {

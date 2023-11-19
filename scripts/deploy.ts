@@ -10,31 +10,62 @@ async function main() {
     await deployer.getAddress()
   );
 
-  const token = await ethers.deployContract("Token", [], {});
-  await token.waitForDeployment();
+  // Dcg
+  if (true) {
+    console.log("deploying contract: Dcg")
 
-  const address = await token.getAddress()
-  console.log("Token address:", address);
+    const dcg = await ethers.deployContract("Dcg", [], {});
+    await dcg.waitForDeployment();
 
-  // We also save the contract's artifacts and address in the frontend directory
+    const dcgAddress = await dcg.getAddress()
 
-  const contractsDir = path.join(__dirname, "..", "frontend", "src", "contracts");
+    // We also save the contract's artifacts and address in the frontend directory
 
-  if (!fs.existsSync(contractsDir)) {
-    fs.mkdirSync(contractsDir);
+    const contractsDir = path.join(__dirname, "..", "frontend", "src", "contracts");
+
+    if (!fs.existsSync(contractsDir)) fs.mkdirSync(contractsDir);
+
+    fs.writeFileSync(
+      path.join(contractsDir, "contract-address.json"),
+      JSON.stringify({ Dcg: dcgAddress }, undefined, 2)
+    );
+
+    const DcgArtifact = artifacts.readArtifactSync("Dcg");
+
+    fs.writeFileSync(
+      path.join(contractsDir, "Dcg.json"),
+      JSON.stringify(DcgArtifact, null, 2)
+    );
   }
 
-  fs.writeFileSync(
-    path.join(contractsDir, "contract-address.json"),
-    JSON.stringify({ Token: address }, undefined, 2)
-  );
 
-  const TokenArtifact = artifacts.readArtifactSync("Token");
+  // Token
+  if (false) {
+    console.log("deploying contract: Token")
 
-  fs.writeFileSync(
-    path.join(contractsDir, "Token.json"),
-    JSON.stringify(TokenArtifact, null, 2)
-  );
+    const token = await ethers.deployContract("Token", [], {});
+    await token.waitForDeployment();
+
+    const tokenAddress = await token.getAddress()
+
+    // We also save the contract's artifacts and address in the frontend directory
+
+    const contractsDir = path.join(__dirname, "..", "frontend", "src", "contracts");
+
+    if (!fs.existsSync(contractsDir)) fs.mkdirSync(contractsDir);
+
+    fs.writeFileSync(
+      path.join(contractsDir, "contract-address.json"),
+      JSON.stringify({ Token: tokenAddress }, undefined, 2)
+    );
+
+    const TokenArtifact = artifacts.readArtifactSync("Token");
+
+    fs.writeFileSync(
+      path.join(contractsDir, "Token.json"),
+      JSON.stringify(TokenArtifact, null, 2)
+    );
+  }
 }
 
 main()
