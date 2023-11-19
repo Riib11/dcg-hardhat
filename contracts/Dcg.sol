@@ -39,7 +39,11 @@ contract Dcg {
         Card[] cards;
     }
 
-    Game[] public games;
+    Game[] games;
+
+    function getGames() public view returns (Game[] memory) {
+        return games;
+    }
 
     // Action
 
