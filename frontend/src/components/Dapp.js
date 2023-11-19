@@ -94,87 +94,6 @@ export class Dapp extends React.Component {
         DCG
       </div>
     );
-
-
-    // TODO: remove
-    // // If the token data or the user's balance hasn't loaded yet, we show
-    // // a loading component.
-    // if ((this.state.tokenData === undefined) || (this.state.balance === undefined)) {
-    //   return <Loading />;
-    // }
-
-    // If everything is loaded, we render the application.
-    // TODO: remove
-    // return (
-    //   <div className="container p-4">
-    //     <div className="row">
-    //       <div className="col-12">
-    //         <h1>
-    //           {this.state.tokenData.name} ({this.state.tokenData.symbol})
-    //         </h1>
-    //         <p>
-    //           Welcome <b>{this.state.selectedAddress}</b>, you have{" "}
-    //           <b>
-    //             {this.state.balance.toString()} {this.state.tokenData.symbol}
-    //           </b>
-    //           .
-    //         </p>
-    //       </div>
-    //     </div>
-
-    //     <hr />
-
-    //     <div className="row">
-    //       <div className="col-12">
-    //         {/* 
-    //           Sending a transaction isn't an immediate action. You have to wait
-    //           for it to be mined.
-    //           If we are waiting for one, we show a message here.
-    //         */}
-    //         {this.state.txBeingSent && (
-    //           <WaitingForTransactionMessage txHash={this.state.txBeingSent} />
-    //         )}
-
-    //         {/* 
-    //           Sending a transaction can fail in multiple ways. 
-    //           If that happened, we show a message here.
-    //         */}
-    //         {this.state.transactionError && (
-    //           <TransactionErrorMessage
-    //             message={this._getRpcErrorMessage(this.state.transactionError)}
-    //             dismiss={() => this._dismissTransactionError()}
-    //           />
-    //         )}
-    //       </div>
-    //     </div>
-
-    //     <div className="row">
-    //       <div className="col-12">
-    //         {/*
-    //           If the user has no tokens, we don't show the Transfer form
-    //         */}
-    //         {this.state.balance == 0 && (
-    //           <NoTokensMessage selectedAddress={this.state.selectedAddress} />
-    //         )}
-
-    //         {/*
-    //           This component displays a form that the user can use to send a 
-    //           transaction and transfer some tokens.
-    //           The component doesn't have logic, it just calls the transferTokens
-    //           callback.
-    //         */}
-    //         {this.state.balance > 0 && (
-    //           <Transfer
-    //             transferTokens={(to, amount) =>
-    //               this._transferTokens(to, amount)
-    //             }
-    //             tokenSymbol={this.state.tokenData.symbol}
-    //           />
-    //         )}
-    //       </div>
-    //     </div>
-    //   </div>
-    // );
   }
 
   componentWillUnmount() {
@@ -347,29 +266,6 @@ export class Dapp extends React.Component {
     this._pollDataInterval = undefined;
   }
 
-  // TODO: remove
-  // The next two methods just read from the contract and store the results
-  // in the component state.
-  async _getTokenData() {
-    // console.debug("[_getTokenData]");
-    const name = await this._token.name();
-    const symbol = await this._token.symbol();
-
-    // console.debug("[_getTokenData]", { name, symbol });
-
-    this.setState({ tokenData: { name, symbol } });
-  }
-
-  // This method just clears part of the state.
-  _dismissTransactionError() {
-    this.setState({ transactionError: undefined });
-  }
-
-  // This method just clears part of the state.
-  _dismissNetworkError() {
-    this.setState({ networkError: undefined });
-  }
-
   // This is an utility method that turns an RPC error into a human readable
   // message.
   _getRpcErrorMessage(error) {
@@ -501,4 +397,110 @@ export class Dapp extends React.Component {
       this.setState({ txBeingSent: undefined });
     }
   }
+
+
+  // TODO: remove
+  // The next two methods just read from the contract and store the results
+  // in the component state.
+  async _getTokenData() {
+    // console.debug("[_getTokenData]");
+    const name = await this._token.name();
+    const symbol = await this._token.symbol();
+
+    // console.debug("[_getTokenData]", { name, symbol });
+
+    this.setState({ tokenData: { name, symbol } });
+  }
+
+  // This method just clears part of the state.
+  _dismissTransactionError() {
+    this.setState({ transactionError: undefined });
+  }
+
+  // This method just clears part of the state.
+  _dismissNetworkError() {
+    this.setState({ networkError: undefined });
+  }
 }
+
+/*
+// TODO: remove
+// If the token data or the user's balance hasn't loaded yet, we show
+// a loading component.
+if ((this.state.tokenData === undefined) || (this.state.balance === undefined)) {
+  return <Loading />;
+}
+
+If everything is loaded, we render the application.
+TODO: remove
+return (
+  <div className="container p-4">
+    <div className="row">
+      <div className="col-12">
+        <h1>
+          {this.state.tokenData.name} ({this.state.tokenData.symbol})
+        </h1>
+        <p>
+          Welcome <b>{this.state.selectedAddress}</b>, you have{" "}
+          <b>
+            {this.state.balance.toString()} {this.state.tokenData.symbol}
+          </b>
+          .
+        </p>
+      </div>
+    </div>
+
+    <hr />
+
+    <div className="row">
+      <div className="col-12">
+        {
+          // Sending a transaction isn't an immediate action. You have to wait
+          // for it to be mined.
+          // If we are waiting for one, we show a message here.
+        }
+        {this.state.txBeingSent && (
+          <WaitingForTransactionMessage txHash={this.state.txBeingSent} />
+        )}
+
+        { 
+          // Sending a transaction can fail in multiple ways. 
+          // If that happened, we show a message here.
+        }
+        {this.state.transactionError && (
+          <TransactionErrorMessage
+            message={this._getRpcErrorMessage(this.state.transactionError)}
+            dismiss={() => this._dismissTransactionError()}
+          />
+        )}
+      </div>
+    </div>
+
+    <div className="row">
+      <div className="col-12">
+        {
+          // If the user has no tokens, we don't show the Transfer form
+        }
+        {this.state.balance == 0 && (
+          <NoTokensMessage selectedAddress={this.state.selectedAddress} />
+        )}
+
+        {
+          // This component displays a form that the user can use to send a 
+          // transaction and transfer some tokens.
+          // The component doesn't have logic, it just calls the transferTokens
+          // callback.
+        }
+        {this.state.balance > 0 && (
+          <Transfer
+            transferTokens={(to, amount) =>
+              this._transferTokens(to, amount)
+            }
+            tokenSymbol={this.state.tokenData.symbol}
+          />
+        )}
+      </div>
+    </div>
+  </div>
+);
+*/
