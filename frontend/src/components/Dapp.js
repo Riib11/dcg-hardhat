@@ -55,7 +55,7 @@ export class Dapp extends React.Component {
       networkError: undefined,
       // Dcg
       games: undefined,
-      gameIx: undefined,
+      gameIx: 0,
     };
 
     this.state = this.initialState;
@@ -89,11 +89,78 @@ export class Dapp extends React.Component {
       return <Loading />;
     }
 
+    const game_list_view = (() => {
+      if (this.state.games.length == 0) {
+        return (<div>number of games: {this.state.games.length}</div>);
+      } else {
+        return (
+          <div>
+            <div>number of games: {this.state.games.length}</div>
+            <div>
+              {this.state.games.map((game, gameIx_) =>
+              (<div className="game-list-item" key={gameIx_} onClick={(event) => {
+                this.setState({ gameIx: gameIx_ });
+              }}>
+                <div className="game-list-item-players">GAME#{gameIx_}: {game.player1_addr} vs {game.player2_addr}</div>
+              </div>))}
+            </div>
+          </div>
+        )
+      }
+    })();
+
+    const game_view = (() => {
+      if (this.state.games.length == 0) {
+        return (
+          <div>
+            game:none
+          </div>
+        )
+      } else {
+        let game = this.state.games[0];
+        console.log(game);
+        return (
+          <div className="game">
+            <div>GAME #{this.state.gameIx}</div>
+            <div>
+              Player 1
+              <div>PWR[{game.player1_cardPower.toString()}]</div>
+            </div>
+            <div>
+              Player 2
+              <div>PWR[{game.player2_cardPower.toString()}]</div>
+            </div>
+          </div>
+        );
+      }
+    })();
+
+    const create_game_view = (() => {
+      return (
+        <div>
+          <button onClick={async (event) => {
+            // TODO: what structure data to give?
+            await this._dgc.createGame(
+              this.state.selectedAddress, // address player1_addr,
+              0, // uint player1_cardPower,
+              this.state.selectedAddress, // address player2_addr,
+              1 // uint player2_cardPower
+            );
+          }}>
+            create game
+          </button>
+        </div>
+      )
+    })();
+
     return (
       <div>
-        DCG
+        <h1>DCG</h1>
+        {game_view}
+        {create_game_view}
+        {game_list_view}
       </div>
-    );
+    )
   }
 
   componentWillUnmount() {

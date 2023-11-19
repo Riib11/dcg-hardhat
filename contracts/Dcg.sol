@@ -8,35 +8,14 @@ pragma solidity ^0.8.9;
 import "hardhat/console.sol";
 
 contract Dcg {
-    event CreatedGame(uint gameIx, Game game);
-    event UpdatedGame(uint gameIx, Game game);
-
-    // Card
-
-    struct Card {
-        string name;
-        uint strength;
-        uint health;
-        Ability ability;
-    }
-
-    enum Ability {
-        // TODO
-        Attack,
-        Defend
-    }
-
     // Game
 
     struct Game {
-        Player player1;
-        Player player2;
+        address player1_addr;
+        uint player1_cardPower;
+        address player2_addr;
+        uint player2_cardPower;
         uint turn;
-    }
-
-    struct Player {
-        address addr;
-        Card[] cards;
     }
 
     Game[] games;
@@ -62,15 +41,42 @@ contract Dcg {
     /*
      * Create a new game.
      */
-    function createGame(Game calldata game) public returns (uint gameIx) {
-        require(game.player1.addr == msg.sender);
-        require(game.turn == 0);
-
-        games.push(game);
+    function createGame(
+        address player1_addr,
+        uint player1_cardPower,
+        address player2_addr,
+        uint player2_cardPower
+    ) public returns (uint gameIx) {
+        games.push(
+            Game(
+                player1_addr,
+                player1_cardPower,
+                player2_addr,
+                player2_cardPower,
+                0
+            )
+        );
         gameIx = games.length;
-
-        emit CreatedGame(gameIx, game);
     }
+
+    // function createExampleGame() public returns (uint gameIx) {
+    //     Card[] memory cards1 = new Card[](1);
+    //     cards1[0] = Card("monster", 2, 2, Ability.Attack);
+
+    //     Card[] memory cards2 = new Card[](1);
+    //     cards2[0] = Card("angel", 1, 3, Ability.Defend);
+
+    //     Game memory game = Game(
+    //         Player(msg.sender, cards1),
+    //         Player(msg.sender, cards2),
+    //         0
+    //     );
+
+    //     games.push(game);
+    //     gameIx = games.length;
+
+    //     emit CreatedGame(gameIx, game);
+    // }
 
     /*
      * Play your turn in an existing game.
@@ -79,15 +85,13 @@ contract Dcg {
         require(gameIx < games.length);
         Game storage game = games[gameIx];
         if (game.turn % 2 == 0) {
-            require(game.player1.addr == msg.sender);
+            require(game.player1_addr == msg.sender);
         } else {
-            require(game.player2.addr == msg.sender);
+            require(game.player2_addr == msg.sender);
         }
 
         // TODO: do something based on `action`
 
         game.turn += 1;
-
-        emit UpdatedGame(gameIx, game);
     }
 }
